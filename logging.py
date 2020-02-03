@@ -171,9 +171,7 @@ class Logger(object):
         :param args: arguments to ``format_string.format()``, can be empty
 
         """
-        print( self._handler.items())
         for __handler, __level in self._handler.items():
-            print( __handler, __level)
             if level >= __level:
                 __handler.emit(level, format_string % args)
 
