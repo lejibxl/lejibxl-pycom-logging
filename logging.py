@@ -139,6 +139,7 @@ def getLogger(name):
 
     """
     if name not in logger_cache:
+        print("new logger")
         logger_cache[name] = Logger()
     return logger_cache[name]
 
@@ -151,9 +152,17 @@ class Logger(object):
         :param handler: what to use to output messages. Defaults to a PrintHandler.
 
         """
+        self._level = NOTSET
         self._handler = {PrintHandler():0}
 
-    def addHandler(self, hldr, level):
+    def setLevel(self, value):
+        """Set the logging cuttoff level.
+        :param value: the lowest level to output
+        """
+        self._level = value
+        self.debug("LOG>set to level {}".format(level_for(value)))
+
+    def addHandler(self, hldr, level=0):#default level = NOTSET
         """Sets the handler of this logger to the specified handler.
         *NOTE* this is slightly different from the CPython equivalent which adds
         the handler rather than replaceing it.
@@ -171,9 +180,10 @@ class Logger(object):
         :param args: arguments to ``format_string.format()``, can be empty
 
         """
-        for __handler, __level in self._handler.items():
-            if level >= __level:
-                __handler.emit(level, format_string % args)
+        if level >= self._level:
+            for __handler, __level in self._handler.items():
+                if level >= __level:
+                    __handler.emit(level, format_string % args)
 
     def debug(self, format_string, *args):
         """Log a debug message.
